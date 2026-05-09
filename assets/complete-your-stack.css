@@ -1,0 +1,56 @@
+/* ─── Contenedor y Espaciado ─────────────────────────────────────────────── */
+
+.complete-your-stack {
+  display: block;
+}
+
+.complete-your-stack__header {
+  margin-bottom: 3rem;
+}
+
+/* ─── Grid Dinámico ──────────────────────────────────────────────────────── */
+
+.complete-your-stack__grid {
+  display: grid;
+  /* En móvil siempre 2 columnas para aprovechar el espacio */
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--grid-mobile-horizontal-spacing, 1.5rem);
+  row-gap: 3rem;
+}
+
+@media screen and (min-width: 750px) {
+  .complete-your-stack__grid {
+    /* En tablet/desktop usamos la variable de productos_to_show, máximo 4 */
+    grid-template-columns: repeat(var(--columns-desktop), 1fr);
+    gap: var(--grid-desktop-horizontal-spacing, 2rem);
+    row-gap: 4rem;
+  }
+}
+
+/* ─── Item y Badge ──────────────────────────────────────────────────────── */
+
+.complete-your-stack__item {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.complete-your-stack__line-badge {
+  align-self: flex-start;
+  margin-bottom: 1.2rem;
+  padding: 0.5rem 1.2rem;
+  background-color: rgba(var(--color-foreground), 0.05);
+  border: 0.1rem solid rgba(var(--color-foreground), 0.1);
+  border-radius: var(--badge-corner-radius, 2rem);
+  color: rgba(var(--color-foreground), 0.8);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1rem;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* Ajuste para que la card ocupe el resto del espacio */
+.complete-your-stack__item .card-wrapper {
+  flex-grow: 1;
+}
