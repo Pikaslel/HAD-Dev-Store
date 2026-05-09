@@ -1,0 +1,113 @@
+{{- 'complete-your-stack.css' | asset_url | stylesheet_tag -}}
+{{- 'component-card.css' | asset_url | stylesheet_tag -}}
+{{- 'component-price.css' | asset_url | stylesheet_tag -}}
+
+{%- liquid
+  assign cross_sell_raw = product.metafields.custom.product_line.value
+  assign products_to_show = section.settings.products_to_show 
+  assign section_title = section.settings.title | default: 'Completa tu stack'
+  
+  comment
+    Normalización extrema: pasamos a minúsculas y quitamos espacios.
+    " America, Sport" se convierte en un array de ["america", "sport"]
+  endcomment
+  assign product_lines = cross_sell_raw | downcase | replace: ' ', '' | split: ','
+  assign total_rendered = 0
+-%}
+
+{%- comment -%} Permitimos que la sección sea visible en el Editor de Temas aunque no haya metafield {%- endcomment -%}
+{%- if cross_sell_raw != blank or request.design_mode -%}
+  <section 
+  class="complete-your-stack page-width section-{{ section.id }}-padding" 
+  id="section-{{ section.id }}"
+  style="--columns-desktop: {{ section.settings.products_to_show | at_most: 4 }};"
+>
+
+    <div class="complete-your-stack__header center">
+      <h2 class="title {{ section.settings.heading_size }}">{{ section_title | escape }}</h2>
+    </div>
+
+    <div class="complete-your-stack__grid">
+      {%- for line_key in product_lines -%}
+        {%- liquid
+          assign current_collection = nil
+          assign current_label = ""
+
+          comment
+            Mapeo robusto basado en tus nombres específicos
+          endcomment
+          if line_key contains 'sport'
+            if section.settings.collection_sports != blank
+              assign current_collection = section.settings.collection_sports
+            else
+              assign current_collection = collections['healthy-sports']
+            endif
+            assign current_label = section.settings.label_sports
+          elsif line_key contains 'america'
+              if section.settings.collection_america != blank
+                assign current_collection = section.settings.collection_america
+              else
+                assign current_collection = collections['healthy-america']
+              endif
+            assign current_label = section.settings.label_america
+          elsif line_key contains 'nutri'
+            if section.settings.collection_nutrivita != blank
+              assign current_collection = section.settings.collection_nutrivita
+            else
+              assign current_collection = collections['nutrivita']
+            endif
+            assign current_label = section.settings.label_nutrivita
+          endif
+        -%}
+
+        {%- if current_collection != blank -%}
+          {%- assign limit_per_line = products_to_show | divided_by: product_lines.size | at_least: 1 -%}
+          {%- assign line_count = 0 -%}
+
+          {%- for coll_product in current_collection.products -%}
+            {%- if coll_product.id == product.id -%}{%- continue -%}{%- endif -%}
+            {%- if total_rendered >= products_to_show or line_count >= limit_per_line -%}{%- break -%}{%- endif -%}
+
+            <div class="complete-your-stack__item">
+              <span class="complete-your-stack__line-badge">{{ current_label }}</span>
+              {% render 'card-product',
+                card_product: coll_product,
+                media_aspect_ratio: section.settings.image_ratio,
+                show_secondary_image: section.settings.show_secondary_image,
+                show_vendor: section.settings.show_vendor
+              %}
+            </div>
+            {%- assign total_rendered = total_rendered | plus: 1 -%}
+            {%- assign line_count = line_count | plus: 1 -%}
+          {%- endfor -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Completa tu stack",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Título", "default": "Completa tu stack" },
+    { "type": "select", "id": "heading_size", "label": "Tamaño Título", "options": [{"value":"h2","label":"Pequeño"},{"value":"h1","label":"Mediano"}], "default": "h2" },
+    { "type": "range", "id": "products_to_show", "label": "Productos total", "min": 2, "max": 6, "default": 4 },
+    { "type": "header", "content": "Colecciones" },
+    { "type": "collection", "id": "collection_sports", "label": "Colección Healthy Sports" },
+    { "type": "text", "id": "label_sports", "label": "Etiqueta Sports", "default": "Healthy Sports" },
+    { "type": "collection", "id": "collection_america", "label": "Colección Healthy America" },
+    { "type": "text", "id": "label_america", "label": "Etiqueta America", "default": "Healthy America" },
+    { "type": "collection", "id": "collection_nutrivita", "label": "Colección Nutrivita" },
+    { "type": "text", "id": "label_nutrivita", "label": "Etiqueta Nutrivita", "default": "Nutrivita" },
+    { "type": "header", "content": "Card" },
+    { "type": "select", "id": "image_ratio", "label": "Imagen", "options": [{"value":"adapt","label":"Adapt"},{"value":"square","label":"Square"}], "default": "adapt" },
+    { "type": "checkbox", "id": "show_secondary_image", "label": "Imagen 2", "default": true },
+    { "type": "checkbox", "id": "show_vendor", "label": "Vendor", "default": false },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 100, "default": 36, "label": "Padding superior" },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 100, "default": 36 , "label": "Padding inferior" }
+  ],
+  "presets": [{ "name": "Completa tu stack" }]
+}
+{% endschema %}
