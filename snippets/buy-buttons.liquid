@@ -12,7 +12,7 @@
 {% endcomment %}
 <div {{ block.shopify_attributes }}>
   {% if product.metafields.custom.no_buttons_payment %}
-    {{ product.metafields.custom.no_buttons_payment }}
+    {{ product.metafields.custom.no_buttons_payment.value }}
   {% endif %}
   {%- if product != blank and product.metafields.custom.no_buttons_payment -%}
     {%- liquid
