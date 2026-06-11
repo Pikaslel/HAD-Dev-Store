@@ -372,5 +372,72 @@
     {%- if settings.cart_type == 'drawer' -%}
       <script src="{{ 'cart-drawer.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
+
+
+
+  {% comment %} add to cart auto {% endcomment %}
+    <script>
+  (function() {
+    const CONFIG = {
+      triggerTag: 'healthy-america-promo',
+      freeVariantId: 47641800573158,
+      requiredQty: 2
+    };
+
+    async function getCart() {
+      const res = await fetch('/cart.js');
+      return res.json();
+    }
+
+    async function addFreeProduct() {
+      await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: [{ id: CONFIG.freeVariantId, quantity: 1 }]
+        })
+      });
+    }
+
+    async function removeFreeProduct() {
+      await fetch('/cart/change.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: CONFIG.freeVariantId,
+          quantity: 0
+        })
+      });
+    }
+
+    async function checkCart() {
+      const cart = await getCart();
+
+      const triggerItems = cart.items.filter(item =>
+        item.tags && item.tags.includes(CONFIG.triggerTag)
+      );
+
+      const triggerQty = triggerItems.reduce((sum, item) => sum + item.quantity, 0);
+      const freeItem = cart.items.find(item => item.variant_id === CONFIG.freeVariantId);
+
+      if (triggerQty >= CONFIG.requiredQty) {
+        if (!freeItem) {
+          await addFreeProduct();
+          document.dispatchEvent(new CustomEvent('cart:refresh'));
+        }
+      } else {
+        if (freeItem) {
+          await removeFreeProduct();
+          document.dispatchEvent(new CustomEvent('cart:refresh'));
+        }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', checkCart);
+    document.addEventListener('cart:updated', checkCart);
+    document.addEventListener('cart:refresh', checkCart);
+
+  })();
+  </script>
   </body>
 </html>
