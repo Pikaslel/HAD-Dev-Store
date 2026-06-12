@@ -142,18 +142,18 @@
     },
     "content_for_index": [],
     "blocks": {
-      "8605505498557855500": {
-        "type": "shopify://apps/bogos-io-free-gift/blocks/app-embed/0432bba6-720a-4e95-be5a-b868386f7aa6",
-        "disabled": false,
-        "settings": {}
-      },
       "1987381849243170004": {
         "type": "shopify://apps/apphero-free-gift/blocks/app-embed/775538df-2a18-473b-ada3-d731b074c1a3",
         "disabled": true,
         "settings": {}
       },
-      "8853274458742905975": {
-        "type": "shopify://apps/hitsy-progress-bar/blocks/hitsy/0e2f6173-7277-4c61-a4df-2e70602cd303",
+      "8218531531362863771": {
+        "type": "shopify://apps/kite-discount-free-gift/blocks/app-embed/2c7302c4-455d-4078-a829-48563ba26089",
+        "disabled": false,
+        "settings": {}
+      },
+      "8605505498557855500": {
+        "type": "shopify://apps/bogos-io-free-gift/blocks/app-embed/0432bba6-720a-4e95-be5a-b868386f7aa6",
         "disabled": true,
         "settings": {}
       }
